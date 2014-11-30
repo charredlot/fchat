@@ -13,7 +13,7 @@ $(function() {
         function (call_id, call_url) {
             var msg_html = '<p>User call #' + call_id + ':<a href="' + call_url + '">Click here to answer</a></p>';
             $('#lines').append(msg_html);
-            alert('beep boop beep');
+            alert(msg_html);
         }
     )
 });

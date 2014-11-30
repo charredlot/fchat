@@ -6,11 +6,12 @@
 <script type="text/javascript">
     window.room = "{{ room.id }}";
 </script>
-<script src="/static/js/on_call.js?hack={{  js_version }}"></script>
+<script src="/static/js/on_call.js?hack={{  js_version_hack }}"></script>
 {% endblock %}
 
 {% block content %}
-<p>beep boop beep</p>
+<p>Calls will appear below:</p>
+<hr>
 <div id="events">
     <div id="lines"></div>
 </div>
