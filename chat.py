@@ -14,14 +14,16 @@ from werkzeug.exceptions import NotFound
 from gevent import monkey
 
 from flask import Flask, Response, request, render_template, url_for, redirect, make_response
-from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.login import session, current_user, LoginManager
 
 from local_utils import slugify, get_rand_string
 from rooms import ChatRoomMgr, ChatRoom
 from volunteer import Volunteer, VolunteerMgr
+from settings import Settings
 
 monkey.patch_all()
+
+JS_VERSION_HACK=21
 
 URL_CONNECT_PREFIX = 'connect'
 URL_ROOM_PREFIX = 'room'
@@ -29,24 +31,15 @@ URL_ON_CALL_PREFIX = 'on_call'
 LOGIN_CALLBACK_URL='/login_callback'
 
 app = Flask(__name__)
-app.secret_key = 'ameklfmaekvdfklvnow4' # get_rand_string(32)
+app.secret_key = 'ameklfmaekvdfklvnow4' # so don't have to relog for testing, should be get_rand_string(32)
 app.debug = True
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/chat.db'
-db = SQLAlchemy(app)
+
+# no persistent for now
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/chat.db'
+#db = SQLAlchemy(app)
+
 volunteer_mgr = None
 room_mgr = None
-
-class Settings(object):
-    OAUTH2_URL = 'https://accounts.google.com/o/oauth2/'
-    GAUTH_URI = 'https://accounts.google.com/o/oauth2/auth'
-    GAUTH_TOKEN_URI = 'https://accounts.google.com/o/oauth2/token'
-    GAUTH_SCOPE = 'https://www.googleapis.com/auth/userinfo.email'
-    GAUTH_PROFILE_URI = 'https://www.googleapis.com/oauth2/v1/userinfo'
-    GAUTH_SECRET = 'OW-ylwg1IgZH9GgDSc9pwp_l'
-    # 'mystical-hawk-771'
-    GAUTH_CLIENT_ID = '934594949893-f914vohd4d45bs6ihmlu7s4c6eh6ee70.apps.googleusercontent.com'
-    GAUTH_TOKEN_REVOKE_URI = 'https://accounts.google.com/o/oauth2/revoke'
-    EXTERNAL_ADDRESS = 'http://146.148.81.187.xip.io:5000'
 
 # utils
 def get_volunteer_from_session(session):
@@ -72,11 +65,8 @@ def alert_volunteers(room):
 # views
 @app.route('/{0}/<name>'.format(URL_ROOM_PREFIX))
 def room(name):
-    print ','.join( (s for s in session) )
-
     room = room_mgr.get_room(name)
     if not room:
-        print 'eek'
         raise NotFound()
 
     vol = get_volunteer_from_session(session)
@@ -93,7 +83,7 @@ def room(name):
         except KeyError:
             raise NotFound()
 
-    return render_template('room.html', room=room)
+    return render_template('room.html', room=room, js_version_hack=JS_VERSION_HACK)
 
 @app.route('/already_answered')
 def already_answered():
@@ -123,7 +113,7 @@ def on_call(email):
         # TODO: explanatory error
         return redirect(url_for('index'))
     else:    
-        return render_template('on_call.html', room=room, hack=1)
+        return render_template('on_call.html', room=room, js_version_hack=JS_VERSION_HACK)
 
 @app.route('/dashboard')
 def dashboard():
@@ -254,6 +244,7 @@ class ChatNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
     def on_join(self, room):
         self.room = room
         self.join(room)
+        self.emit_to_room(self.room, 'nicknames', self.nicknames)
         return True
 
     def on_nickname(self, nickname):
@@ -261,7 +252,7 @@ class ChatNamespace(BaseNamespace, RoomsMixin, BroadcastMixin):
         self.nicknames.append(nickname)
         self.session['nickname'] = nickname
         #self.broadcast_event('announcement', '%s has connected' % nickname)
-        #self.broadcast_event('nicknames', self.nicknames)
+        self.broadcast_event('nicknames', self.nicknames)
         self.emit_to_room(self.room, 'nicknames', self.nicknames)
         self.emit_to_room(self.room, 'msg_to_room', nickname, '{0} has connected'.format(nickname))
         return True, nickname
