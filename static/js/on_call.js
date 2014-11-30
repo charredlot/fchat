@@ -11,9 +11,9 @@ $(function() {
 
     ev_sock.on('new_call',
         function (call_id, call_url) {
-            var msg_html = '<p>User call #' + call_id + ':<a href="' + call_url + '">Click here to answer</a></p>';
-            $('#lines').append(msg_html);
-            alert(msg_html);
+            var msg_html = '<p>User call #' + call_id + ':<a href="' + call_url + '" target="_blank">Click here to answer</a></p>';
+            $('#lines').append(msg_html)
+            alert('User call #' + call_id + ', please check your window to answer');
         }
     )
 });

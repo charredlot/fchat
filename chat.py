@@ -23,7 +23,7 @@ from settings import Settings
 
 monkey.patch_all()
 
-JS_VERSION_HACK=21
+JS_VERSION_HACK=24
 
 URL_CONNECT_PREFIX = 'connect'
 URL_ROOM_PREFIX = 'room'
