@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block title %}Trans Lifeline{% endblock %}
+
+{% block content %}
+<p>There are currently {{ num_avail_volunteers }} volunteers on call.</p>
+<p><a href='/call'>Click here</a> to speak to a volunteer.</p>
+<p></p>
+<p>Are you a volunteer? <a href='/login'>Login here</a></p>
+{% endblock content%}

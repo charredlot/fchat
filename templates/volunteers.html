@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="volunteers">
+        <p>Volunteers <a href='/protected'>click here to login</a></p>
+        <table border="2">
+            <tr>
+            <td>user</td>
+            <td>current calls</td>
+            <td>max calls</td>
+            </tr>
+            {% for username, vol in volunteers.iteritems() %}
+            <tr>
+            <td><a href="/{{ link_prefix }}/{{ username }}">{{ username }}</a></td>
+            <td>{{ vol.get_calls_current() }}</td>
+            <td>{{ vol.get_calls_max() }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+{% endblock content %}
+

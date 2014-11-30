@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+
+{% block content %}
+<p><a href="{{ on_call_url }}" target="_blank">Go on call</a></p>
+<p>Your current calls: {{ current_calls }}</p>
+<p>Your max calls: {{ max_calls }}</p>
+{% endblock content %}
+

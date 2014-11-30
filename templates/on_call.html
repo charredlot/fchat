@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}{{ room }}{% endblock %}
+
+{% block extra_js %}
+<script type="text/javascript">
+    window.room = "{{ room.id }}";
+</script>
+<script src="/static/js/on_call.js?hack={{  js_version }}"></script>
+{% endblock %}
+
+{% block content %}
+<p>beep boop beep</p>
+<div id="events">
+    <div id="lines"></div>
+</div>
+{% endblock %}
